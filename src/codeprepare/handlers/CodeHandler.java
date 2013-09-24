@@ -14,6 +14,7 @@ import com.vektor.classstructure.VektorClassStruct;
  * Our sample handler extends AbstractHandler, an IHandler base class.
  * @see org.eclipse.core.commands.IHandler
  * @see org.eclipse.core.commands.AbstractHandler
+ * 
  */
 public class CodeHandler extends AbstractHandler {
 	/**

@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 
@@ -63,8 +64,6 @@ public class VektorClassStruct {
 		File currentDir = new File(prjDir);
 		if (!currentDir.exists())
 			currentDir.mkdirs();
-		// System.out.println("Working in project " + project.getName() +
-		// " - Path:"+currentDir);
 		if (project.isNatureEnabled("org.eclipse.jdt.core.javanature")) {
 			IJavaProject javaProject = JavaCore.create(project);
 			printPackageInfos(javaProject, prjDir);
@@ -83,7 +82,6 @@ public class VektorClassStruct {
 				File f = new File(pkgDir);
 				if (!f.exists())
 					f.mkdirs();
-				// System.out.println("Package " + mypackage.getElementName());
 				printICompilationUnitInfo(mypackage, pkgDir);
 
 			}
@@ -94,11 +92,6 @@ public class VektorClassStruct {
 	private static void printICompilationUnitInfo(IPackageFragment mypackage,
 			String packageDir) throws JavaModelException, BadLocationException {
 		for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
-			// System.out.println("FILE " + unit.getElementName());
-			// System.out.println(new Gson()
-			// .toJson(printCompilationUnitDetails(unit)));
-
-			// No need to check if dir exists, already done in caller methods.
 			printCompilationUnitDetails(unit, packageDir);
 		}
 	}
@@ -106,9 +99,7 @@ public class VektorClassStruct {
 	private static classDocument printCompilationUnitDetails(
 			ICompilationUnit unit, String packageDir)
 			throws JavaModelException, BadLocationException {
-		// System.out.println("Source file " + unit.getPath());
 		Document doc = new Document(unit.getSource());
-		// System.out.println("Has number of lines: " + doc.getNumberOfLines());
 		classDocument classDoc = new classDocument("OK",
 				doc.getNumberOfLines(), unit.getElementName(), printStructure(
 						unit, doc), maxLevel);
@@ -132,7 +123,6 @@ public class VektorClassStruct {
 		IType[] types = unit.getTypes();
 		ArrayList<classStructure> classes = new ArrayList<classStructure>();
 		for (IType type : types) {
-			// System.out.println("printStructure " + type.getElementName());
 			classes.add(new classStructure(type.getElementName(), type
 					.getFlags(), getSubTypes(type, doc, maxLevel),
 					printIFieldDetails(type, doc), printIMethodDetails(type,
@@ -151,7 +141,6 @@ public class VektorClassStruct {
 		if (level > maxLevel)
 			maxLevel = level;
 		for (IType tp : tps) {
-			// System.out.println("printStructure " + tp.getElementName());
 			subtypes.add(new classStructure(tp.getElementName(), tp.getFlags(),
 					getSubTypes(tp, doc, level), printIFieldDetails(tp, doc),
 					printIMethodDetails(tp, doc)));
@@ -185,6 +174,7 @@ public class VektorClassStruct {
 					.getOffset() + method.getSourceRange().getLength() - 1);
 			ms.add(new classMethod(method.getElementName(), method.getFlags(),
 					from, to));
+			System.out.println(Signature.toString(method.getReturnType()));
 		}
 		return ms;
 	}
