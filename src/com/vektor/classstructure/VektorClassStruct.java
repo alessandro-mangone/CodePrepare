@@ -31,6 +31,8 @@ import com.vektor.classstructure.VektorSerialization.classDocument;
 import com.vektor.classstructure.VektorSerialization.classField;
 import com.vektor.classstructure.VektorSerialization.classMethod;
 import com.vektor.classstructure.VektorSerialization.classStructure;
+import com.vektor.classstructure.VektorSerialization.fs;
+import com.vektor.classstructure.VektorSerialization.fsElement;
 import com.vektor.classstructure.VektorSerialization.sourceCode;
 import com.vektor.parsing.VektorParser;
 
@@ -40,6 +42,7 @@ public class VektorClassStruct {
 	private static IProject[] projects = root.getProjects();
 	private final static String path = System.getProperty("user.home")
 			+ File.separator + "Documents" + File.separator + "PreparedCode";
+	private final static String jsonIdentifier = "-code.json";
 	private static int maxLevel = 0;
 
 	public static void scan() throws BadLocationException {
@@ -56,6 +59,29 @@ public class VektorClassStruct {
 		}
 		System.out.println("All projects updated in "
 				+ (System.currentTimeMillis() - start) + " ms.");
+		start = System.currentTimeMillis();
+		updateFs(new File(path));
+		System.out.println("FS JSON objects created in "
+				+ (System.currentTimeMillis() - start) + " ms.");
+	}
+
+	private static void updateFs(File fs) {
+		File[] list = fs.listFiles();
+		ArrayList<fsElement> files = new ArrayList<fsElement>();
+		for (File file : list) {
+			if (file.isDirectory()) {
+				files.add(new fsElement(file.getName(), true, file
+						.getAbsolutePath().substring(path.length())));
+				updateFs(file);
+			} else if (file.getName().endsWith(jsonIdentifier)
+					&& new File(file.getParent(), file.getName().replace(
+							jsonIdentifier, "")
+							+ "-structure.json").exists()) {
+				files.add(new fsElement(file.getName().replace(jsonIdentifier, ""), false, file
+						.getParent().substring(path.length())));
+			}
+		}
+		writeToFile(new fs(files), new File(fs, "dir.json"));
 	}
 
 	private static void printProjectInfo(IProject project)
@@ -158,7 +184,7 @@ public class VektorClassStruct {
 			int to = 1 + doc.getLineOfOffset(field.getSourceRange().getOffset()
 					+ field.getSourceRange().getLength() - 1);
 			fs.add(new classField(field.getElementName(), field.getFlags(),
-					from, to));
+					from, to, Signature.toString(field.getTypeSignature())));
 		}
 		return fs;
 	}
@@ -173,8 +199,7 @@ public class VektorClassStruct {
 			int to = 1 + doc.getLineOfOffset(method.getSourceRange()
 					.getOffset() + method.getSourceRange().getLength() - 1);
 			ms.add(new classMethod(method.getElementName(), method.getFlags(),
-					from, to));
-			System.out.println(Signature.toString(method.getReturnType()));
+					from, to, Signature.toString(method.getReturnType())));
 		}
 		return ms;
 	}

@@ -5,8 +5,44 @@ import java.util.ArrayList;
 import org.eclipse.jdt.core.Flags;
 
 import com.google.gson.annotations.SerializedName;
-
 public class VektorSerialization {
+
+	public static class fs {
+		@SerializedName("files")
+		private ArrayList<fsElement> files;
+
+		public ArrayList<fsElement> getFiles() {
+			return files;
+		}
+		public fs(ArrayList<fsElement> files){
+			this.files=files;
+		}
+	}
+
+	public static class fsElement {
+		@SerializedName("name")
+		private String name;
+		@SerializedName("isDir")
+		private boolean isDir;
+		@SerializedName("curDir")
+		private String curDir;
+		public String getName() {
+			return name;
+		}
+
+		public boolean isDir() {
+			return isDir;
+		}
+
+		public String getCurDir() {
+			return curDir;
+		}
+		public fsElement(String name, boolean isDir, String curDir){
+			this.name=name;
+			this.isDir=isDir;
+			this.curDir=curDir;
+		}
+	}
 
 	public static class sourceCode {
 		@SerializedName("status")
@@ -77,12 +113,12 @@ public class VektorSerialization {
 		private int nestlevel;
 
 		public classDocument(String status, int lines, String name,
-				ArrayList<classStructure> classes,int nestlevel) {
+				ArrayList<classStructure> classes, int nestlevel) {
 			this.lines = lines;
 			this.status = status;
 			this.name = name;
 			this.classes = classes;
-			this.nestlevel=nestlevel;
+			this.nestlevel = nestlevel;
 		}
 
 		public void addClass(classStructure classs) {
@@ -132,6 +168,8 @@ public class VektorSerialization {
 	public static class classField {
 		@SerializedName("name")
 		private String name;
+		@SerializedName("type")
+		private String type;
 		@SerializedName("access")
 		private String access;
 		@SerializedName("final")
@@ -147,7 +185,8 @@ public class VektorSerialization {
 		@SerializedName("lineEnd")
 		private int lineEnd;
 
-		public classField(String name, int flags, int lineStart, int lineEnd) {
+		public classField(String name, int flags, int lineStart, int lineEnd,
+				String type) {
 			this.name = name;
 			this.access = getAccessFlags(flags);
 			this.isFinal = isFinal(flags);
@@ -156,6 +195,7 @@ public class VektorSerialization {
 			this.isVolatile = isVolatile(flags);
 			this.lineStart = lineStart;
 			this.lineEnd = lineEnd;
+			this.type = type;
 		}
 
 		public String toString() {
@@ -166,6 +206,8 @@ public class VektorSerialization {
 	public static class classMethod {
 		@SerializedName("name")
 		private String name;
+		@SerializedName("returns")
+		private String returnType;
 		@SerializedName("access")
 		private String access;
 		@SerializedName("abstract")
@@ -183,9 +225,11 @@ public class VektorSerialization {
 		@SerializedName("lineEnd")
 		private int lineEnd;
 
-		public classMethod(String name, int flags, int lineStart, int lineEnd) {
+		public classMethod(String name, int flags, int lineStart, int lineEnd,
+				String returnType) {
 			this.access = getAccessFlags(flags);
 			this.isAbstract = isAbstract(flags);
+			this.returnType = returnType;
 			this.isFinal = isFinal(flags);
 			this.isNative = isNative(flags);
 			this.isStatic = isStatic(flags);
