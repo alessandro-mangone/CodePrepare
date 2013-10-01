@@ -65,23 +65,23 @@ public class VektorClassStruct {
 				+ (System.currentTimeMillis() - start) + " ms.");
 	}
 
-	private static void updateFs(File fs) {
-		File[] list = fs.listFiles();
+	private static void updateFs(File f) {
+		File[] list = f.listFiles();
 		ArrayList<fsElement> files = new ArrayList<fsElement>();
 		for (File file : list) {
 			if (file.isDirectory()) {
 				files.add(new fsElement(file.getName(), true, file
-						.getAbsolutePath().substring(path.length())));
+						.getAbsolutePath().substring(path.length()+1).concat(File.separator)));
 				updateFs(file);
 			} else if (file.getName().endsWith(jsonIdentifier)
 					&& new File(file.getParent(), file.getName().replace(
 							jsonIdentifier, "")
 							+ "-structure.json").exists()) {
 				files.add(new fsElement(file.getName().replace(jsonIdentifier, ""), false, file
-						.getParent().substring(path.length())));
+						.getParent().substring(path.length()+1).concat(File.separator)));
 			}
 		}
-		writeToFile(new fs(files), new File(fs, "dir.json"));
+		writeToFile(new fs(files), new File(f, "dir.json"));
 	}
 
 	private static void printProjectInfo(IProject project)
